@@ -1,3 +1,11 @@
+# jsecs
+
+a javascript entity component system. one of many.
+
+i'm not saying it's the best. it's not the best. it barely works. really it's just me drinking beers and writing code for fun. nothing is checked for type safety, there's really no guarantee anything other than the example works.
+
+
+```js
 var jsecs = require('./jsecs')
 
 // make thee an entity
@@ -78,3 +86,17 @@ function step() {
     setTimeout(step, 100)
 }
 step()
+```
+
+to run the test
+
+```
+node test.js
+```
+
+or for more fancy debug info that doesn't really work the way i want it to yet (kinda forget how to make nice debug logs without libraries)
+
+```
+DEBUG=1 node test.js
+```
+

@@ -5,6 +5,12 @@ const system_store = {};
 
 // helper function
 const debug = function() {
+    if (process && typeof process.env.DEBUG === 'undefined') {
+        // return in node if DEBUG env var not set
+        return;
+    }
+
+    // this doesn't really work
     var caller = debug.caller;
     var args = Array.prototype.slice.call(arguments)
     if (caller && typeof caller.name !== 'undefined') {
@@ -20,7 +26,7 @@ function entity() {
     }
     var id = this.id = Math.random().toString(36).slice(2)
     debug('new entitty ' + id)
-    entity_index[id] = {};
+    entity_index[id] = {id: id};
     entity_store.push(entity_index[id]);
     entity_index[id].entity_store_index = entity_store.length - 1;
     debug(entity_index)
