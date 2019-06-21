@@ -1,24 +1,28 @@
 var jsecs = require('./jsecs')
 
 // make thee an entity
-var me = new jsecs.Entity();
+var me = new jsecs.entity();
 
 // make thine component
-var position = new jsecs.Component('position', {
-    x: Number, // whatever .constructor refers to, for numbers, (10).constructor === Number, for example.
+var rigidbody = new jsecs.component('rigidbody', {
+    x: Number,
+  //  y: Num
+})
+var position = new jsecs.component('position', {
+    x: Number,
     y: Number,
     z: Number
 })
 
 // whomst would not also make a second component?
-var velocity = new jsecs.Component('velocity', {
+var velocity = new jsecs.component('velocity', {
     x: Number,
     y: Number,
     z: Number
 })
 
 // a system is created for the masses which ruleth the masses
-var propagate = new jsecs.System('propagate', {}, function () {
+var propagate = new jsecs.system('propagate', {}, function () {
     var dt = 0.1;
     // propagate all the entities with position and velocity
     jsecs.entities.find({
@@ -40,7 +44,7 @@ var propagate = new jsecs.System('propagate', {}, function () {
 })
 
 // what good system would not bare itself before Divinity?
-var render = new jsecs.System('render', {}, function () {
+var render = new jsecs.system('render', {}, function () {
     jsecs.entities.find({
         position: true
     }).map(e => {

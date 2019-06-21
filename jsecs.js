@@ -1,47 +1,71 @@
-const component_store = {};
-const entity_store = [];
-const entity_index = {}
-const system_store = {};
+/**
+ * This first version is not meant to be super fast. Maybe the next version will be.
+ */
+
+var jsecs = {}
+
+/** structure of arrays
+ * each key is a component name, and the value is an array of the component values
+ */
+jsecs.componentStore = {}
+
+/**
+ * list of all entities. each entry is a map of component name to index into the componentStore
+ */
+jsecs.entityStore = []
+
+/**
+ * Each key is an id.
+ * The value is a map of component name to index into the componentStore array for that component
+ */
+jsecs.entityIndex = {}
+
 
 // helper function
-const debug = function() {
-    if (process && typeof process.env.DEBUG === 'undefined') {
-        // return in node if DEBUG env var not set
-        return;
-    }
+var debug = function () {
+  // this doesn't really work
+  var caller = debug.caller
+  var args = Array.prototype.slice.call(arguments)
+  if (caller && typeof caller.name !== 'undefined') {
+    args = [caller.name + '():'].concat(args)
+  }
 
-    // this doesn't really work
-    var caller = debug.caller;
-    var args = Array.prototype.slice.call(arguments)
-    if (caller && typeof caller.name !== 'undefined') {
-        args = [caller.name + '():'].concat(args);
-    }
-
-    console.log.apply(console, args);
+  console.log.apply(console, args)
 }
 
-function entity() {
-    if (!(this instanceof entity)) {
-        return new entity();
-    }
-    var id = this.id = Math.random().toString(36).slice(2)
-    debug('new entitty ' + id)
-    entity_index[id] = {id: id};
-    entity_store.push(entity_index[id]);
-    entity_index[id].entity_store_index = entity_store.length - 1;
-    debug(entity_index)
-    debug(entity_store)
+/**
+ * Entity constructor
+ */
+jsecs.Entity = function Entity (optionalName) {
+  if (!(this instanceof jsecs.Entity)) {
+    return new jsecs.Entity(optionalName)
+  }
+
+  if (typeof optionalName !== 'undefined' && typeof jsecs.entityIndex[optionalName] !== 'undefined') {
+    var errorString = 'entity id ' + optionalName + ' is already taken'
+    console.log(errorString)
+    throw new Error(errorString)
+  }
+  var id = this.id = typeof optionalName === 'undefined' ? Math.random().toString(36).slice(2) : optionalName
+
+  debug('new entitty ' + id)
+  jsecs.entityIndex[id] = this
+  jsecs.entityStore.push(jsecs.entityIndex[id])
+  jsecs.entityIndex[id].entityStoreIndex = jsecs.entityStore.length - 1
+  return jsecs.entityIndex[id]
 }
 
-// puts the component in the component store
-// saves off the index in the entity
-entity.prototype.add = function(component) {
-    component_store[component.name].push(component.obj);
-    entity_index[this.id][component.name] = component.obj;
-    entity_store[entity_index[this.id].entity_store_index][component.name] = component.obj // brackets everywhere, what could go wrong?
-    debug('add', component_store)
-    debug('add', entity_index)
-    debug('add', entity_store)
+/**
+ * puts the component in the component store
+ * saves off the index in the entity
+ */
+jsecs.Entity.prototype.add = function add (component) {
+  jsecs.componentStore[component.name].push(component.obj)
+  jsecs.entityIndex[this.id][component.name] = component.obj
+  jsecs.entityStore[jsecs.entityIndex[this.id].entityStoreIndex][component.name] = component.obj // brackets everywhere, what could go wrong?
+  debug('add', jsecs.componentStore)
+  debug('add', jsecs.entityIndex)
+  debug('add', jsecs.entityStore)
 }
 
 // name can be any string
@@ -53,63 +77,99 @@ entity.prototype.add = function(component) {
  *   y: Number,
  *   z: Number
  * }
- * 
+ *
  * @param {string} name the name of your component type
  * @param {flat object} schema the type definitions for your component
  */
-function component(name, schema) {
-    if (!(this instanceof component)) {
-        return new component(name, schema)
+jsecs.Component = function Component (name, schema) {
+  if (!(this instanceof jsecs.Component)) {
+    return new jsecs.Component(name, schema)
+  }
+  debug('new component ' + name)
+  jsecs.componentStore[name] = []
+  var internalArray = jsecs.componentStore[name]
+  debug(jsecs.componentStore)
+
+  // check name
+  // check schema
+
+  // helper function which turns keys into a string, like {b: 1, a: 2} => 'a, b'
+  // this is for checking that two objects have the exact same keys
+  function getkeys (o) {
+    return Object.keys(schema).sort((a, b) => a < b).reduce((all, key) => {
+      all.push(key)
+      return all
+    }, []).join(', ')
+  }
+  const keys = getkeys(schema)
+
+  // hacks so that "x instanceof jsecs.component" returns true
+  // while at the same time allowing the return object to be callable
+  function instantiateComponent (obj) {
+    debug('creating ' + name, obj)
+
+    // make sure the component has ALL the keys it needs
+    if (getkeys(obj) !== keys) {
+      debug('property mismatch:\n  expected ' + keys + '\n  got ' + getkeys(obj))
+      throw new Error('Cannot make component with the incorrect properties')
     }
-    debug('new component ' + name)
-    component_store[name] = []
-    debug(component_store)
 
-    // check name
-    // check schema
-
-    // hacks so that "x instanceof jsecs.component" returns true
-    // while at the same time allowing the return object to be callable
-    function instantiate_component(obj) {
-        debug('creating ' + name, obj)
-        return {
-            name,
-            obj
-        }
-    }
-    instantiate_component.__proto__ = component.prototype
-    return instantiate_component
-}
-component.prototype = Object.create(Function.prototype)
-
-function system(name, options, fn) {
-    if (!(this instanceof system)) {
-        return new system(name, options, fn);
-    }
-    debug('new system ' + name)
-
-    function run_system() {
-        debug('running ' + name)
-        fn()
-    }
-    run_system.__proto__ = system.prototype
-    return run_system;
-}
-system.prototype = Object.create(Function.prototype)
-
-var entities = {}
-entities.find = function(query) {
-    return entity_store.filter(e => {
-        return Object.keys(query).reduce((ok, component) => {
-            return ok || ( (typeof e[component] !== undefined ) === query[component]);
-        }, false)
+    // make sure each property is of the correct type.
+    Object.keys(obj).map(k => {
+      if (obj[k].constructor !== schema[k]) {
+        debug('property type mismatch for ' + k + '\n  expected ' + schema[k] + '\n  got ' + obj[k])
+        throw new Error('Cannot make component with an incorrect property type')
+      }
     })
 
+    internalArray.push(obj)
+
+    return {
+      name,
+      obj
+    }
+  }
+  // make it be instalceof component or whatever
+  instantiateComponent.__proto__ = jsecs.Component.prototype
+
+  // give it all the fun things, too
+  instantiateComponent.array = internalArray
+
+  return instantiateComponent
+}
+jsecs.Component.prototype = Object.create(Function.prototype)
+
+/**
+ * THis doesn't really do much
+ */
+jsecs.System = function System (name, options, fn) {
+  if (!(this instanceof jsecs.System)) {
+    return new jsecs.System(name, options, fn)
+  }
+  debug('new system ' + name)
+
+  function runSystem () {
+    debug('running ' + name)
+    fn()
+  }
+  runSystem.__proto__ = jsecs.System.prototype
+  return runSystem
+}
+jsecs.System.prototype = Object.create(Function.prototype)
+
+jsecs.entities = {}
+jsecs.entities.find = function find (query) {
+  return jsecs.entityStore.filter(e => {
+    return Object.keys(query).reduce((ok, component) => {
+      return ok || ((typeof e[component] !== 'undefined') === query[component])
+    }, false)
+  })
 }
 
-module.exports = {
-    entity,
-    component,
-    system,
-    entities
+if (typeof window !== 'undefined') {
+  window.jsecs = jsecs
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = jsecs
 }
