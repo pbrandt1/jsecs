@@ -1,0 +1,211 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title>jsecs demo - cat and mouse</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <!-- minified normalize.css -->
+  <style>html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}main{display:block}h1{font-size:2em;margin:0.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace, monospace;font-size:1em}a{background-color:transparent}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:bolder}code,kbd,samp{font-family:monospace, monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-0.25em}sup{top:-0.5em}img{border-style:none}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button,select{text-transform:none}[type="button"],[type="reset"],[type="submit"],button{-webkit-appearance:button}[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner,button::-moz-focus-inner{border-style:none;padding:0}[type="button"]:-moz-focusring,[type="reset"]:-moz-focusring,[type="submit"]:-moz-focusring,button:-moz-focusring{outline:1px dotted ButtonText}fieldset{padding:0.35em 0.75em 0.625em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{vertical-align:baseline}textarea{overflow:auto}[type="checkbox"],[type="radio"]{box-sizing:border-box;padding:0}[type="number"]::-webkit-inner-spin-button,[type="number"]::-webkit-outer-spin-button{height:auto}[type="search"]{-webkit-appearance:textfield;outline-offset:-2px}[type="search"]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}details{display:block}summary{display:list-item}template{display:none}[hidden]{display:none}</style>
+  <!-- mini css framework -->
+  <link rel="stylesheet" href="https://cdn.rawgit.com/Chalarangelo/mini.css/v3.0.1/dist/mini-default.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans+HK&display=swap" rel="stylesheet"> 
+  <style>
+    body {
+      font-family: 'Noto Sans HK', sans-serif;
+      color: #303060
+    }
+  </style>
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+  <!--[if IE]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+  <header>
+    <h1>jsecs DeMo🖤 - ROBOT CATS 😺 AND ROBOT MICE 🐭</h1>
+  </header>
+  <main>
+    <div class="six columns">
+      <p>
+        The evil MR RATFELLER has unleashed a horde of robot mice in San Francisco to steal from the working class.
+      </p>
+      <p>
+        Engineers from across the city have banded together to create a rival fleet of robot cats to catch and destroy the robot mice.
+      </p>
+      <p>
+        Unfortunately, no software develoeprs were available to write the A.I. for the feline fleet,
+        as every last software dev was attending a popular conference in the area.
+        The hardware engineers instead created a simple algorthm based on genetics.
+        The cats behavior is entire governed by a gene sequence, which controls which way the cat moves.
+        When a cat runs into a robot mouse, it eats the mouse and absorbs its battery level.
+        When a cat runs into another cat, they combine their genes and load those new genes into the cat with the lower battery level.
+        WHen a cat runs out of battery, it has to wait for another cat to run into it.
+      </p>
+      <button>UNLEASH THE CATS</button>
+      <button>RESET</button>
+      </div>
+      <div class="six columns">
+        <div style="background-color:gray; width:100%; height:100%;">
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+  <script>
+    /*! modernizr 3.7.1 (Custom Build) | MIT *
+    * https://modernizr.com/download/?-cssanimations-csscolumns-customelements-flexbox-history-picture-pointerevents-postmessage-sizes-srcset-webgl-websockets-webworkers-addtest-domprefixes-hasevent-mq-prefixedcssvalue-prefixes-setclasses-testallprops-testprop-teststyles !*/
+    !function(e,t,n){function r(e,t){return typeof e===t}function o(e){var t=b.className,n=Modernizr._config.classPrefix||"";if(S&&(t=t.baseVal),Modernizr._config.enableJSClass){var r=new RegExp("(^|\\s)"+n+"no-js(\\s|$)");t=t.replace(r,"$1"+n+"js$2")}Modernizr._config.enableClasses&&(e.length>0&&(t+=" "+n+e.join(" "+n)),S?b.className.baseVal=t:b.className=t)}function i(e,t){if("object"==typeof e)for(var n in e)E(e,n)&&i(n,e[n]);else{e=e.toLowerCase();var r=e.split("."),s=Modernizr[r[0]];if(2===r.length&&(s=s[r[1]]),void 0!==s)return Modernizr;t="function"==typeof t?t():t,1===r.length?Modernizr[r[0]]=t:(!Modernizr[r[0]]||Modernizr[r[0]]instanceof Boolean||(Modernizr[r[0]]=new Boolean(Modernizr[r[0]])),Modernizr[r[0]][r[1]]=t),o([(t&&!1!==t?"":"no-")+r.join("-")]),Modernizr._trigger(e,t)}return Modernizr}function s(){return"function"!=typeof t.createElement?t.createElement(arguments[0]):S?t.createElementNS.call(t,"http://www.w3.org/2000/svg",arguments[0]):t.createElement.apply(t,arguments)}function a(){var e=t.body;return e||(e=s(S?"svg":"body"),e.fake=!0),e}function l(e,n,r,o){var i,l,u,f,c="modernizr",d=s("div"),p=a();if(parseInt(r,10))for(;r--;)u=s("div"),u.id=o?o[r]:c+(r+1),d.appendChild(u);return i=s("style"),i.type="text/css",i.id="s"+c,(p.fake?p:d).appendChild(i),p.appendChild(d),i.styleSheet?i.styleSheet.cssText=e:i.appendChild(t.createTextNode(e)),d.id=c,p.fake&&(p.style.background="",p.style.overflow="hidden",f=b.style.overflow,b.style.overflow="hidden",b.appendChild(p)),l=n(d,e),p.fake?(p.parentNode.removeChild(p),b.style.overflow=f,b.offsetHeight):d.parentNode.removeChild(d),!!l}function u(e,t){return!!~(""+e).indexOf(t)}function f(e){return e.replace(/([A-Z])/g,function(e,t){return"-"+t.toLowerCase()}).replace(/^ms-/,"-ms-")}function c(t,n,r){var o;if("getComputedStyle"in e){o=getComputedStyle.call(e,t,n);var i=e.console;if(null!==o)r&&(o=o.getPropertyValue(r));else if(i){var s=i.error?"error":"log";i[s].call(i,"getComputedStyle returning null, its possible modernizr test results are inaccurate")}}else o=!n&&t.currentStyle&&t.currentStyle[r];return o}function d(t,r){var o=t.length;if("CSS"in e&&"supports"in e.CSS){for(;o--;)if(e.CSS.supports(f(t[o]),r))return!0;return!1}if("CSSSupportsRule"in e){for(var i=[];o--;)i.push("("+f(t[o])+":"+r+")");return i=i.join(" or "),l("@supports ("+i+") { #modernizr { position: absolute; } }",function(e){return"absolute"===c(e,null,"position")})}return n}function p(e){return e.replace(/([a-z])-([a-z])/g,function(e,t,n){return t+n.toUpperCase()}).replace(/^-/,"")}function m(e,t,o,i){function a(){f&&(delete L.style,delete L.modElem)}if(i=!r(i,"undefined")&&i,!r(o,"undefined")){var l=d(e,o);if(!r(l,"undefined"))return l}for(var f,c,m,h,v,A=["modernizr","tspan","samp"];!L.style&&A.length;)f=!0,L.modElem=s(A.shift()),L.style=L.modElem.style;for(m=e.length,c=0;c<m;c++)if(h=e[c],v=L.style[h],u(h,"-")&&(h=p(h)),L.style[h]!==n){if(i||r(o,"undefined"))return a(),"pfx"!==t||h;try{L.style[h]=o}catch(e){}if(L.style[h]!==v)return a(),"pfx"!==t||h}return a(),!1}function h(e,t){return function(){return e.apply(t,arguments)}}function v(e,t,n){var o;for(var i in e)if(e[i]in t)return!1===n?e[i]:(o=t[e[i]],r(o,"function")?h(o,n||t):o);return!1}function A(e,t,n,o,i){var s=e.charAt(0).toUpperCase()+e.slice(1),a=(e+" "+z.join(s+" ")+s).split(" ");return r(t,"string")||r(t,"undefined")?m(a,t,o,i):(a=(e+" "+x.join(s+" ")+s).split(" "),v(a,t,n))}function g(e,t,r){return A(e,n,n,t,r)}var y=[],w={_version:"3.7.1",_config:{classPrefix:"",enableClasses:!0,enableJSClass:!0,usePrefixes:!0},_q:[],on:function(e,t){var n=this;setTimeout(function(){t(n[e])},0)},addTest:function(e,t,n){y.push({name:e,fn:t,options:n})},addAsyncTest:function(e){y.push({name:null,fn:e})}},Modernizr=function(){};Modernizr.prototype=w,Modernizr=new Modernizr;var C=[],b=t.documentElement,S="svg"===b.nodeName.toLowerCase(),_="Moz O ms Webkit",x=w._config.usePrefixes?_.toLowerCase().split(" "):[];w._domPrefixes=x;var T=w._config.usePrefixes?" -webkit- -moz- -o- -ms- ".split(" "):["",""];w._prefixes=T;var E;!function(){var e={}.hasOwnProperty;E=r(e,"undefined")||r(e.call,"undefined")?function(e,t){return t in e&&r(e.constructor.prototype[t],"undefined")}:function(t,n){return e.call(t,n)}}(),w._l={},w.on=function(e,t){this._l[e]||(this._l[e]=[]),this._l[e].push(t),Modernizr.hasOwnProperty(e)&&setTimeout(function(){Modernizr._trigger(e,Modernizr[e])},0)},w._trigger=function(e,t){if(this._l[e]){var n=this._l[e];setTimeout(function(){var e;for(e=0;e<n.length;e++)(0,n[e])(t)},0),delete this._l[e]}},Modernizr._q.push(function(){w.addTest=i});var P=function(){function e(e,r){var o;return!!e&&(r&&"string"!=typeof r||(r=s(r||"div")),e="on"+e,o=e in r,!o&&t&&(r.setAttribute||(r=s("div")),r.setAttribute(e,""),o="function"==typeof r[e],r[e]!==n&&(r[e]=n),r.removeAttribute(e)),o)}var t=!("onblur"in b);return e}();w.hasEvent=P;var k=function(){var t=e.matchMedia||e.msMatchMedia;return t?function(e){var n=t(e);return n&&n.matches||!1}:function(t){var n=!1;return l("@media "+t+" { #modernizr { position: absolute; } }",function(t){n="absolute"===(e.getComputedStyle?e.getComputedStyle(t,null):t.currentStyle).position}),n}}();w.mq=k;var B=function(e,t){var n=!1,r=s("div"),o=r.style;if(e in o){var i=x.length;for(o[e]=t,n=o[e];i--&&!n;)o[e]="-"+x[i]+"-"+t,n=o[e]}return""===n&&(n=!1),n};w.prefixedCSSValue=B;var z=w._config.usePrefixes?_.split(" "):[];w._cssomPrefixes=z;var O={elem:s("modernizr")};Modernizr._q.push(function(){delete O.elem});var L={style:O.elem.style};Modernizr._q.unshift(function(){delete L.style}),w.testAllProps=A,w.testAllProps=g;w.testProp=function(e,t,r){return m([e],n,t,r)},w.testStyles=l;Modernizr.addTest("customelements","customElements"in e),Modernizr.addTest("history",function(){var t=navigator.userAgent;return(-1===t.indexOf("Android 2.")&&-1===t.indexOf("Android 4.0")||-1===t.indexOf("Mobile Safari")||-1!==t.indexOf("Chrome")||-1!==t.indexOf("Windows Phone")||"file:"===location.protocol)&&(e.history&&"pushState"in e.history)}),Modernizr.addTest("pointerevents",function(){var e=!1,t=x.length;for(e=Modernizr.hasEvent("pointerdown");t--&&!e;)P(x[t]+"pointerdown")&&(e=!0);return e});var N=new Boolean("postMessage"in e);N.structuredclones=!0;try{e.postMessage({toString:function(){N.structuredclones=!1}},"*")}catch(e){}Modernizr.addTest("postmessage",N),Modernizr.addTest("webgl",function(){return"WebGLRenderingContext"in e});var R=!1;try{R="WebSocket"in e&&2===e.WebSocket.CLOSING}catch(e){}Modernizr.addTest("websockets",R),Modernizr.addTest("cssanimations",g("animationName","a",!0)),function(){Modernizr.addTest("csscolumns",function(){var e=!1,t=g("columnCount");try{e=!!t,e&&(e=new Boolean(e))}catch(e){}return e});for(var e,t,n=["Width","Span","Fill","Gap","Rule","RuleColor","RuleStyle","RuleWidth","BreakBefore","BreakAfter","BreakInside"],r=0;r<n.length;r++)e=n[r].toLowerCase(),t=g("column"+n[r]),"breakbefore"!==e&&"breakafter"!==e&&"breakinside"!==e||(t=t||g(n[r])),Modernizr.addTest("csscolumns."+e,t)}(),Modernizr.addTest("flexbox",g("flexBasis","1px",!0)),Modernizr.addTest("picture","HTMLPictureElement"in e),Modernizr.addAsyncTest(function(){var e,t,n,r=s("img"),o="sizes"in r;!o&&"srcset"in r?(t="data:image/gif;base64,R0lGODlhAgABAPAAAP///wAAACH5BAAAAAAALAAAAAACAAEAAAICBAoAOw==",e="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",n=function(){i("sizes",2===r.width)},r.onload=n,r.onerror=n,r.setAttribute("sizes","9px"),r.srcset=e+" 1w,"+t+" 8w",r.src=e):i("sizes",o)}),Modernizr.addTest("srcset","srcset"in s("img")),Modernizr.addTest("webworkers","Worker"in e),function(){var e,t,n,o,i,s,a;for(var l in y)if(y.hasOwnProperty(l)){if(e=[],t=y[l],t.name&&(e.push(t.name.toLowerCase()),t.options&&t.options.aliases&&t.options.aliases.length))for(n=0;n<t.options.aliases.length;n++)e.push(t.options.aliases[n].toLowerCase());for(o=r(t.fn,"function")?t.fn():t.fn,i=0;i<e.length;i++)s=e[i],a=s.split("."),1===a.length?Modernizr[a[0]]=o:(!Modernizr[a[0]]||Modernizr[a[0]]instanceof Boolean||(Modernizr[a[0]]=new Boolean(Modernizr[a[0]])),Modernizr[a[0]][a[1]]=o),C.push((o?"":"no-")+a.join("-"))}}(),o(C),delete w.addTest,delete w.addAsyncTest;for(var j=0;j<Modernizr._q.length;j++)Modernizr._q[j]();e.Modernizr=Modernizr}(window,document);
+  </script>
+
+  <script src="jsecs.js"></script>
+  <script>
+    /* the source code for the demo */
+
+    //
+    // Components
+    //
+    const bodyComponent = jsecs.Component('body', {
+      // position and orientation
+      x: Number,
+      y: Number,
+      theta: Number,
+
+      // hitbox for collisions
+      radius: Number
+    })
+
+    const movementComponent = jsecs.Component('movement', {
+      vx: Number,
+      vy: Number,
+      vtheta: Number,
+      ax: Number,
+      ay: Number,
+      atheta: Number
+    })
+
+    const robot = jsecs.Component('robot', {
+      // battery level, hit points basically
+      battery: Number,
+
+      // whether its a cat or mouse robot
+      type: Number, // 0 for cat, 1 for mouse
+
+      // sensors: it can only see in front of it, in a certain radius
+      /*
+        split up the forwared field of view into 4 pizza slices
+        in each pizza slice you have:
+        - number of enemies
+        - proximity of closest enemy. This is field-of-view minus the distance. so it's inverse of radius. 0 is furthest away, higher is closer.
+      
+        i'll use wnw for west north west, etc.
+      */
+      wnwNumber: Number,
+      wnwProximity: Number,
+      nnwNumber: Number,
+      nnwProximity: Number,
+      nneNumber: Number,
+      nneProximity: Number,
+      eneNumber: Number,
+      eneProximity: Number
+      // also the movementComponent's vx and vy will be part of the sensor vector in the neural net computation
+    })
+
+    /* ok this is complicated
+     * it's a neural net. X inputs are sensors. Y outputs are acceleration in the x and y direction.
+     * in between you have N nodes with weights
+     */
+    const gene = jsecs.Component('gene', {
+      // number of elements = number of weights
+      // hidden layer = X inputs times N nodes
+      //              = 10 * 11
+      //              = 110
+      // 
+      // output layer = N nodes * Y outputs
+      //              = 11 * 2
+      //              = 22
+      //
+      // total = 132 weights, which is the length of the chromosome
+      chromosome: Array
+    })
+
+    //
+    // Update positions with the "move" system
+    //
+    const move = jsecs.System('move bodies', (dt) => {
+      robot.array.map(b => {
+        b.x = b.x + b.vx * dt;
+        b.y = b.y + b.vy * dt;
+
+        b.vx = b.vx + ( 0.5 - Math.random() ) * dt;
+        b.vy = b.vy + ( 0.5 - Math.random() ) * dt;
+
+        // just put theta in the direction of movement
+        b.theta = Math.atan2(-b.vx, b.vy);
+      })
+    })
+
+    //
+    // Collision detection and sensor updates
+    //
+    var detectCollisions = jsecs.System('detect collisions', () => {
+      robot.array.map((robot1, index1) => {
+        robot.array.map((robot2, index2) => {
+          // don't re-detect collisions (already did 1-2, don't do 2-1)
+          // and don't detect collisions with self (=)
+          if (index2 <= index1) {
+            return
+          }
+
+          const x = robot1.x - robot2.x;
+          const y = robot1.y - robot2.y;
+          const dist = Math.sqrt(x*x + y*y);
+          if (dist < (robot1.radius + robot2.radius)) {
+            // collision detected
+            console.log('collision detected')
+          }
+        })
+      })
+    })
+
+
+    //
+    // Render system
+    // 
+    var canvas = document.querySelector('canvas')
+    var render = jsecs.System('render', () => {
+      // render each of the components
+      robot.array.map(b => {
+        // use pixijs or something to draw it in canvass
+        console.log('rendering robot', b.x, b.y, b.theta)
+      })
+    })
+
+
+    //
+    // Make entities
+    //
+    function addMouse() {
+      var m = new jsecs.Entity();
+      // random initial state
+
+    }
+
+
+
+  </script>
+</body>
+
+</html>
