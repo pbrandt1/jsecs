@@ -81,7 +81,7 @@
       // position and orientation
       x: Number,
       y: Number,
-      theta: Number,
+      theta: Number, // this is derived from vx and vy if they exist
 
       // hitbox for collisions
       radius: Number
@@ -90,10 +90,8 @@
     const movementComponent = jsecs.Component('movement', {
       vx: Number,
       vy: Number,
-      vtheta: Number,
       ax: Number,
-      ay: Number,
-      atheta: Number
+      ay: Number
     })
 
     const robot = jsecs.Component('robot', {
@@ -108,7 +106,7 @@
         split up the forwared field of view into 4 pizza slices
         in each pizza slice you have:
         - number of enemies
-        - proximity of closest enemy. This is field-of-view minus the distance. so it's inverse of radius. 0 is furthest away, higher is closer.
+        - proximity of closest enemy. 0 is furthest away, higher is closer. This is field-of-view minus the distance away. so it's opposite of radius. 
       
         i'll use wnw for west north west, etc.
       */
@@ -127,7 +125,7 @@
      * it's a neural net. X inputs are sensors. Y outputs are acceleration in the x and y direction.
      * in between you have N nodes with weights
      */
-    const gene = jsecs.Component('gene', {
+    const genomeComponent = jsecs.Component('genome', {
       // number of elements = number of weights
       // hidden layer = X inputs times N nodes
       //              = 10 * 11
@@ -157,24 +155,80 @@
       })
     })
 
+    // helper function, this only happens between living robot cats. (dead ones get the full genome of the living one)
+    function geneticCombination(a, b) {
+      // assume types are all right
+      return a.map((value, index) => {
+        // 1/3 chance A wins, 1/3 chance B wins, and 1/3 chance of random walk
+        switch (Math.random() * 3 | 0) {
+          case 0:
+            return value;
+          case 1:
+            return b[index];
+          case 2:
+            return value + Math.random() - 0.5;
+        }
+      })
+    }
+
+    // random walk a genome. idk when this would happen.
+    function mutateGenome(a) {
+      return a.map(v => v + Math.random() - 0.5);
+    }
+
+    // for new spawns, just at the start of the game
+    function newGenome(length) {
+      const a = [];
+      for (var i = 0; i < length; i++) {
+        a[i] = Math.random() - 0.5;
+      }
+    }
+
     //
     // Collision detection and sensor updates
     //
     var detectCollisions = jsecs.System('detect collisions', () => {
-      robot.array.map((robot1, index1) => {
-        robot.array.map((robot2, index2) => {
+      var entities = jsecs.entities.find({
+        body: true,
+        robot: true
+      });
+
+      entity.body.array.map((body1, index1) => {
+        entity.body.array.map((body2, index2) => {
           // don't re-detect collisions (already did 1-2, don't do 2-1)
           // and don't detect collisions with self (=)
           if (index2 <= index1) {
             return
           }
 
-          const x = robot1.x - robot2.x;
-          const y = robot1.y - robot2.y;
+          // store off references
+          const e1 = entities[index1]
+          const e2 = entities[index2]
+
+          const x = body1.x - body2.x;
+          const y = body1.y - body2.y;
           const dist = Math.sqrt(x*x + y*y);
-          if (dist < (robot1.radius + robot2.radius)) {
+          if (dist < (body1.radius + body2.radius)) {
             // collision detected
             console.log('collision detected')
+
+            // if it's a cat and a mouse, eat the mouse
+            // um note that since cat = 0 and mouse = 1, if you add them together and they're different it = 1
+            var type = e1.robot.type + e2.robot.type;
+            if (type === 0) {
+              // cat collides with cat
+              // if one of the cats is dead, transfer the ive cat's genes, slightly mutated into it
+              if (e1.robot.battery === 0) {
+                e1.robot.battery = 50;
+                e1.genome.chromosome = mutateGenome(e2.genome.chromosome)
+              } else if (e2.robot.battery === 0) {
+                e2.robot.battery = 50;
+                e2.genome.chromosome = mutateGenome(e1.genome.chromosome)
+              } else {
+                // both alive, get kinky, lets scramble some genes
+                
+              }
+            }
           }
         })
       })
