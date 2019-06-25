@@ -40,16 +40,17 @@
       <p>
         The evil MR RATFELLER has unleashed a horde of robot mice in San Francisco to steal from the working class.
       </p>
+      <!-- image of Rickston E Ratfeller III -->
       <p>
-        Engineers from across the city have banded together to create a rival fleet of robot cats to catch and destroy the robot mice.
+        Hardware hackers and makers from across the city have banded together to create a rival fleet of robot cats to catch and destroy the robot mice.
       </p>
       <p>
         Unfortunately, no software develoeprs were available to write the A.I. for the feline fleet,
         as every last software dev was attending a popular conference in the area.
-        The hardware engineers instead created a simple algorthm based on genetics.
-        The cats behavior is entire governed by a gene sequence, which controls which way the cat moves.
+        The rag tag team of hackers instead created a simple algorthm based on genetics.
+        The cats behavior is entirely governed by a gene sequence, which controls which way the cat moves.
         When a cat runs into a robot mouse, it eats the mouse and absorbs its battery level.
-        When a cat runs into another cat, they combine their genes and load those new genes into the cat with the lower battery level.
+        When a cat runs into another cat, they combine their genes and load those new genes into a new cat, and split their battery levels.
         WHen a cat runs out of battery, it has to wait for another cat to run into it.
       </p>
       <button>UNLEASH THE CATS</button>
@@ -77,85 +78,196 @@
     //
     // Components
     //
+
+    // OK so i'm thinking about DATA here, but i'm also thinking about whatever BATCH OPERATIONS we will have to do on this data
+    // What is going to be the most costly batch operation?
+    // Probably the "sensing" part, which will likely be on the order or n-squared, where n is the number of cats plus mice.
+    // So right away, let's put all the sensing data together to facilitate that n-squared operation
     const bodyComponent = jsecs.Component('body', {
       // position and orientation
       x: Number,
       y: Number,
-      theta: Number, // this is derived from vx and vy if they exist
+      theta: Number,
 
-      // hitbox for collisions
-      radius: Number
+      // sensed enemies in the four pizza slices (todo remember to make a picture eventually)
+      // the number is proximity, so 0 is farthest away, higher is closer. 100 - r. 
+      enemies: Array
     })
 
-    const movementComponent = jsecs.Component('movement', {
-      vx: Number,
-      vy: Number,
-      ax: Number,
-      ay: Number
-    })
-
-    const robot = jsecs.Component('robot', {
+    // and then there's all the messy "game logic"
+    // vx and vy live here for some reason
+    const robotComponent = jsecs.Component('robot', {
       // battery level, hit points basically
       battery: Number,
 
       // whether its a cat or mouse robot
       type: Number, // 0 for cat, 1 for mouse
 
-      // sensors: it can only see in front of it, in a certain radius
-      /*
-        split up the forwared field of view into 4 pizza slices
-        in each pizza slice you have:
-        - number of enemies
-        - proximity of closest enemy. 0 is furthest away, higher is closer. This is field-of-view minus the distance away. so it's opposite of radius. 
-      
-        i'll use wnw for west north west, etc.
-      */
-      wnwNumber: Number,
-      wnwProximity: Number,
-      nnwNumber: Number,
-      nnwProximity: Number,
-      nneNumber: Number,
-      nneProximity: Number,
-      eneNumber: Number,
-      eneProximity: Number
-      // also the movementComponent's vx and vy will be part of the sensor vector in the neural net computation
+      // neural net learning in the cats
+      // hidden layer is 7 nodes i think (because sensing layer is 6: four pizza slices and vx/vy, but in r and theta terms)
+      // and output is only two nodes: acceleration in the r and theta directions.
+      // so you have 6*7 + 7*2 = 56 weights
+      neurons: Array,
+
+      // why here?
+      vx: Number,
+      vy: Number
     })
 
-    /* ok this is complicated
-     * it's a neural net. X inputs are sensors. Y outputs are acceleration in the x and y direction.
-     * in between you have N nodes with weights
-     */
-    const genomeComponent = jsecs.Component('genome', {
-      // number of elements = number of weights
-      // hidden layer = X inputs times N nodes
-      //              = 10 * 11
-      //              = 110
-      // 
-      // output layer = N nodes * Y outputs
-      //              = 11 * 2
-      //              = 22
-      //
-      // total = 132 weights, which is the length of the chromosome
-      chromosome: Array
-    })
+    function getPizzaSlice(angle) {
+      // normalize to be -180 to +180
+      if (angle > Math.PI) {
+        angle -= 2 * Math.PI;
+      } else if (angle < -Math.PI) {
+        angle += 2 * Math.PI;
+      }
 
-    //
-    // Update positions with the "move" system
-    //
-    const move = jsecs.System('move bodies', (dt) => {
-      robot.array.map(b => {
-        b.x = b.x + b.vx * dt;
-        b.y = b.y + b.vy * dt;
+      if (angle > Math.PI / 2 || angle < -Math.PI / 2) {
+        return -1
+      } else if (angle > Math.PI / 4) {
+        return 0
+      } else if (angle > 0) {
+        return 1
+      } else if (angle > -Math.PI / 4) {
+        return 2
+      } else {
+        return 3
+      }
+    }
 
-        b.vx = b.vx + ( 0.5 - Math.random() ) * dt;
-        b.vy = b.vy + ( 0.5 - Math.random() ) * dt;
+    // We'll just use a single system here, and spoiler alert a system is really just a function.
+    function loop() {
+      // first move everything
+      jsecs.entities.find({
+        robot: true
+      }).map(e => {
+        var ar = 0;
+        var atheta = 0;
+        var body = e.body;
+        var vr = 0;
+        var vtheta = 0;
+        if (e.robot.type === 0) {
+          // cat calculate accelerations
+          // wow such neural net
+          var sensor_vec = e.body.enemies.concat([vr, vtheta])
+          var hidden_layer = [];
+          for (var i = 0; i < sensor_vec.length + 1; i++) {
+            hidden_layer[i] = 0;
+            for (var j = 0; j < sensor_vec.length; j++) {
+              var weight = e.robot.neurons[sensor_vec.length * i + j];
+              hidden_layer[i] += sensor_vec[j] * weight;
+            }
+          }
 
-        // just put theta in the direction of movement
-        b.theta = Math.atan2(-b.vx, b.vy);
+          var output_layer = [0, 0]
+          for (var i = 0; i < output_layer.length; i++) {
+            output_layer[i] = 0;
+            for (var j = 0; j < hidden_layer.length; j++) {
+              var weight = e.robot.neurons[sensor_vec.length * hidden_layer.length + hidden_layer.length * i + j]
+              output_layer[i] += hidden_layer[j] * weight;
+            }
+          }
+
+          ar = output_layer[0];
+          atheta = output_layer[1];
+
+        } else {
+          // mouse calculate accelerations. they move sort of in circles if they are not being chased
+          if (Math.max.apply(null, body.enemies) === 0) {
+            ar = 0;
+            atheta = Math.random() - 0.5;
+          } else {
+            // runs in opposite direction
+            ar = -1;
+            atheta = 0;
+          }
+        }
+
+        // now propagate state
+        var theta_rad = body.theta * Math.PI / 180
+        var ax = ar * Math.sin(theta_rad) + atheta * Math.cos(theta_rad)
+        var ay = ar * Math.cos(theta_rad) - atheta * Math.sin(theta_rad)
+
+        // cap the max acceleration
+        var amag = Math.sqrt(ax * ax + ay * ay)
+        if (amag > 5 && e.robot.type === 0) {
+          ax = ax * 5 / amag;
+          ay = ay * 5 / amag;
+        } else if (amag > 6 && e.robot.type === 1) {
+          ax = ax * 6 / amag;
+          ay = ay * 6 / amag;
+        }
+
+        body.x += e.robot.vx * dt;
+        body.y += e.robot.vy * dt;
+
+        e.robot.vx += ax * dt;
+        e.robot.vy += ay * dt;
+
+        // cap the max speed
+        var vmag = Math.sqrt(e.robot.vx * e.robot.vx + e.robot.vy * e.robot.vy)
+        if (vmag > 10 && e.robot.type === 0) {
+          e.robot.vx = e.robot.vx * 10 / vmag;
+          e.robot.vy = e.robot.vy * 10 / vmag;
+        } else if (vmag > 8 && e.robot.type === 1) {
+          e.robot.vx = e.robot.vx * 8 / vmag;
+          e.robot.vy = e.robot.vy * 8 / vmag;
+        }
+
+        body.theta = Math.atan2(-e.robot.vx, e.robot.vy) // straight up is 0, positive is counterclockwise
+
+        // and prepare for sensor check by zeroing out the sensors
+        body.sensor_vec = [0, 0, 0, 0]
       })
-    })
+
+      // then update the sensors and check for collisions
+      var collisions = []
+      for (var i = 0; i < bodyComponent.array.length; i++) {
+        for (var j = i + 1; j < bodyComponent.array.length; j++) {
+          const b1 = bodyComponent.array[i];
+          const b2 = bodyComponent.array[j];
+
+          // check if in range
+          const x = b2.x - b1.x;
+          const y = b2.y - b1.y;
+          const r = Math.sqrt(x*x + y*y)
+          if (r >= 100) {
+            // they cannot see each other
+            return;
+          } else if (r < 10) {
+            // they collided, this will be handled in the game logic section below
+            collisions.push({
+              b1,
+              b2
+            })
+            return;
+          }
+
+          // determine angle
+          const theta = Math.atan2(-(b2.x - b1.x), b2.y - b1.y);
+          const b1_angle = theta - b1.theta;
+          const b2_angle = theta - b2.theta - Math.PI;
+          
+          const b1_slice = getPizzaSlice(b1_angle);
+          const b2_slice = getPizzaSlice(b2_angle);
+          
+          if (b1_slice >= 0) {
+            b1.sensor_vec[b1_slice] = Math.max(b1.sensor_vec[b1_slice], 100 - r)
+          }
+
+          if (b2_slice >= 0) {
+            b2.sensor_vec[b2_slice] = Math.max(b2.sensor_vec[b2_slice], 100 - r)
+          }
+        }
+      }
+      
+      // perform game logic
+
+      // render
+    }
 
     // helper function, this only happens between living robot cats. (dead ones get the full genome of the living one)
+    // who new that neurons are genetic haha
     function geneticCombination(a, b) {
       // assume types are all right
       return a.map((value, index) => {
@@ -185,77 +297,49 @@
     }
 
     //
-    // Collision detection and sensor updates
-    //
-    var detectCollisions = jsecs.System('detect collisions', () => {
-      var entities = jsecs.entities.find({
-        body: true,
-        robot: true
-      });
-
-      entity.body.array.map((body1, index1) => {
-        entity.body.array.map((body2, index2) => {
-          // don't re-detect collisions (already did 1-2, don't do 2-1)
-          // and don't detect collisions with self (=)
-          if (index2 <= index1) {
-            return
-          }
-
-          // store off references
-          const e1 = entities[index1]
-          const e2 = entities[index2]
-
-          const x = body1.x - body2.x;
-          const y = body1.y - body2.y;
-          const dist = Math.sqrt(x*x + y*y);
-          if (dist < (body1.radius + body2.radius)) {
-            // collision detected
-            console.log('collision detected')
-
-            // if it's a cat and a mouse, eat the mouse
-            // um note that since cat = 0 and mouse = 1, if you add them together and they're different it = 1
-            var type = e1.robot.type + e2.robot.type;
-            if (type === 0) {
-              // cat collides with cat
-              // if one of the cats is dead, transfer the ive cat's genes, slightly mutated into it
-              if (e1.robot.battery === 0) {
-                e1.robot.battery = 50;
-                e1.genome.chromosome = mutateGenome(e2.genome.chromosome)
-              } else if (e2.robot.battery === 0) {
-                e2.robot.battery = 50;
-                e2.genome.chromosome = mutateGenome(e1.genome.chromosome)
-              } else {
-                // both alive, get kinky, lets scramble some genes
-                
-              }
-            }
-          }
-        })
-      })
-    })
-
-
-    //
-    // Render system
-    // 
-    var canvas = document.querySelector('canvas')
-    var render = jsecs.System('render', () => {
-      // render each of the components
-      robot.array.map(b => {
-        // use pixijs or something to draw it in canvass
-        console.log('rendering robot', b.x, b.y, b.theta)
-      })
-    })
-
-
-    //
     // Make entities
     //
-    function addMouse() {
-      var m = new jsecs.Entity();
-      // random initial state
+    // since this is javascript you have to be thinking about how the program is actually allocating memory. it's not like c/fortran where things in the same array are next to each other.
+    const NUM_CATS = 100;
+    const NUM_MICE = 500;
+    for (var i = 0; i < NUM_CATS; i++) {
+      var e = new jsecs.Entity()
+      var neurons = []
+      for (var gene = 0; gene < 56; gene++) {
+        neurons.push(Math.random() - 0.5);
+      }
 
+      e.add(robotComponent({
+        battery: 100,
+        type: 0, // cat
+        vx: 0,
+        vy: 0,
+        neurons: neurons
+      }))
     }
+
+    for (var i = 0; i < NUM_MICE; i++) {
+      var e = new jsecs.Entity()
+      e.add(robotComponent({
+        battery: 100,
+        type: 1, // mouse
+        vx: 0,
+        vy: 0,
+        neurons: []
+      }))
+    }
+
+    // add a body to all the entities
+    // i suspect that doing this all in a loop here will mean that the body memory is contiguous...
+    jsecs.entities.array.map(e => {
+      e.add(bodyComponent({
+        x: Math.random() * 1000,
+        y: Math.random() * 800,
+        theta: Math.random() * 360,
+        enemies: [0, 0, 0, 0]
+      }))
+    })
+
 
 
 
